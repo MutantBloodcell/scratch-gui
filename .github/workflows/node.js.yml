@@ -1,22 +1,37 @@
-name: CI
+name: CI & Deploy
 
 on:
   push:
-  pull_request:
+    branches: [ develop ]
+
+permissions:
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        persist-credentials: false
-    - name: Install Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 22
-        cache: npm
-    - run: npm ci
-    - run: npm run build
-    - run: npm run test:unit
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: build
+          branch: gh-pages
+          
